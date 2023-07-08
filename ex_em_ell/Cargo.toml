@@ -1,0 +1,16 @@
+[package]
+name = "ex_em_ell"
+version = "0.1.0"
+edition = "2021"
+description = "Provide macros for serializing and deserializing XML"
+
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+thiserror = "1.0.41"
+xml-rs = "0.8.15"
+
+[package.metadata.cyclonedx]
+format = "json"
+included_dependencies = "all"
+output_options = { cdx = true, pattern = "package" }

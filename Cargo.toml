@@ -1,0 +1,4 @@
+[workspace]
+members = [
+  "ex_em_ell",
+]
