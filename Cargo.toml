@@ -1,4 +1,5 @@
 [workspace]
 members = [
   "ex_em_ell",
+  "ex_em_ell_derive",
 ]

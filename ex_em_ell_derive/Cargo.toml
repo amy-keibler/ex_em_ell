@@ -1,0 +1,23 @@
+[package]
+name = "ex_em_ell_derive"
+version = "0.1.0"
+edition = "2021"
+description = "Provide macros for serializing and deserializing XML (derive sub-crate)"
+
+license = "MIT OR Apache-2.0"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+heck = { version = "0.4.1", features = ["unicode"] }
+proc-macro-error = "1.0.4"
+proc-macro2 = "1.0.63"
+quote = "1.0.29"
+syn = { version = "2.0.23", features = ["full", "extra-traits"] }
+
+
+[package.metadata.cyclonedx]
+format = "json"
+included_dependencies = "all"
+output_options = { cdx = true, pattern = "package" }
