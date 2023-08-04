@@ -15,6 +15,15 @@ xml-rs = "0.8.15"
 default = ["derive"]
 derive = ["ex_em_ell_derive"]
 
+[dev-dependencies]
+insta = "1.31.0"
+
+[profile.dev.package.insta]
+opt-level = 3
+
+[profile.dev.package.similar]
+opt-level = 3
+
 [package.metadata.cyclonedx]
 format = "json"
 included_dependencies = "all"

@@ -84,6 +84,8 @@
           packages = with pkgs; [
             rustToolchain
             cargo-edit
+            cargo-expand
+            cargo-insta
             cargo-msrv
             cargo-outdated
 

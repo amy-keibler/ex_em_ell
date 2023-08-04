@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, ex_em_ell::FromXmlDocument, ex_em_ell::ToXmlDocument)]
+#[derive(Debug, PartialEq, ex_em_ell::ToXmlDocument)]
 struct Example {
     field: String,
 }
@@ -16,5 +16,6 @@ fn test_to_xml() {
     let input = Example {
         field: "value".to_string(),
     };
-    let expected = "<example><field>value</field></example>";
+    let actual = ex_em_ell::to_string_pretty(&input).expect("Failed to output XML");
+    insta::assert_snapshot!(actual);
 }
