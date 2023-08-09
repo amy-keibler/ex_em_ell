@@ -1,3 +1,6 @@
 /.direnv/
 /result
 /target/
+
+# Snapshot files that need to be reviewed should not be committed
+*.snap.new

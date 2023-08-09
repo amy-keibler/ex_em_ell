@@ -1,44 +1,32 @@
-use std::io::{Read, Write};
-use xml::{
-    attribute::OwnedAttribute, name::OwnedName, namespace::Namespace, EventReader, EventWriter,
-};
-
 pub mod errors;
+pub mod traits;
+pub mod xml_utils;
 
-use errors::{XmlReadError, XmlWriteError};
+use errors::XmlWriteError;
+use xml::{EmitterConfig, EventWriter};
 
-pub trait ToXmlDocument {
-    fn to_xml_document<W: Write>(
-        self: &Self,
-        writer: &mut EventWriter<W>,
-    ) -> Result<(), XmlWriteError>;
+pub use ex_em_ell_derive::{FromXmlDocument, FromXmlElement, ToXmlDocument, ToXmlElement};
+pub use traits::{FromXmlDocument, FromXmlElement, ToXmlDocument, ToXmlElement};
+pub extern crate xml;
+
+pub fn to_string<T: ToXmlDocument>(value: &T) -> Result<String, XmlWriteError> {
+    to_string_with_config(value, EmitterConfig::default())
 }
 
-pub trait ToXmlElement {
-    fn to_xml_element<W: Write>(
-        self: &Self,
-        writer: &mut EventWriter<W>,
-        tag: &str,
-    ) -> Result<(), XmlWriteError>;
-
-    fn will_write(self: &Self) -> bool {
-        true
-    }
+pub fn to_string_pretty<T: ToXmlDocument>(value: &T) -> Result<String, XmlWriteError> {
+    let config = EmitterConfig::default().perform_indent(true);
+    to_string_with_config(value, config)
 }
 
-pub trait FromXmlDocument {
-    fn from_xml_document<R: Read>(reader: &mut EventReader<R>) -> Result<Self, XmlReadError>
-    where
-        Self: Sized;
-}
+fn to_string_with_config<T: ToXmlDocument>(
+    value: &T,
+    config: EmitterConfig,
+) -> Result<String, XmlWriteError> {
+    let mut output = Vec::new();
+    let mut event_writer = EventWriter::new_with_config(&mut output, config);
 
-pub trait FromXmlElement {
-    fn from_xml_element<R: Read>(
-        reader: &mut EventReader<R>,
-        element_name: &OwnedName,
-        element_attributes: &[OwnedAttribute],
-        element_namespace: &Namespace,
-    ) -> Result<Self, XmlReadError>
-    where
-        Self: Sized;
+    value.to_xml_document(&mut event_writer)?;
+
+    let output = String::from_utf8_lossy(&output).to_string();
+    Ok(output)
 }

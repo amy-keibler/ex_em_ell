@@ -33,7 +33,16 @@
 
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
 
-        src = craneLib.cleanCargoSource (craneLib.path ./.);
+        xmlFilter = path: _type: builtins.match ".*xml$" path != null;
+        snapshotTestFilter = path: _type: builtins.match ".*snap" path != null;
+
+        srcFilter = path: type:
+          (xmlFilter path type) || (snapshotTestFilter path type) || (craneLib.filterCargoSources path type);
+
+        src = pkgs.lib.cleanSourceWith {
+          src = craneLib.path ./.;
+          filter = srcFilter;
+        };
 
         commonArgs = {
           inherit src;
@@ -42,7 +51,17 @@
           version = "0.1.0";
         };
 
-        cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+        cargoArtifacts = craneLib.buildDepsOnly (commonArgs // {
+          dummySrc = craneLib.mkDummySrc {
+            inherit src;
+
+            # ex_em_ell_derive is a proc macro crate, so it cannot have non-proc macro functions
+            extraDummyScript = ''
+              rm $out/ex_em_ell_derive/src/lib.rs
+              touch $out/ex_em_ell_derive/src/lib.rs
+            '';
+          };
+        });
 
         ex_em_ell = craneLib.buildPackage (commonArgs // {
           inherit cargoArtifacts;
@@ -68,19 +87,14 @@
         packages.ex_em_ell = ex_em_ell;
         packages.default = packages.ex_em_ell;
 
-        # uncomment if there is a binary to be run
-        # apps.cargo-cyclonedx = flake-utils.lib.mkApp {
-        #   drv = packages.ex_em_ell;
-        #   name = "ex_em_ell";
-        # };
-        # apps.default = apps.cargo-cyclonedx;
-
         devShells.default = pkgs.mkShell {
           inputsFrom = builtins.attrValues self.checks.${system};
 
           packages = with pkgs; [
             rustToolchain
             cargo-edit
+            cargo-expand
+            cargo-insta
             cargo-msrv
             cargo-outdated
 
