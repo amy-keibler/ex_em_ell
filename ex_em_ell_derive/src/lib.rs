@@ -1,6 +1,7 @@
 use heck::ToLowerCamelCase;
 use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned};
+use syn::spanned::Spanned;
 use syn::{parse_macro_input, parse_quote, Data, DeriveInput, Fields, GenericParam, Generics};
 
 #[proc_macro_error::proc_macro_error]
@@ -65,7 +66,38 @@ fn add_to_xml_element_trait_bounds(mut generics: Generics) -> Generics {
 
 fn generate_write_xml_document(input: &DeriveInput) -> TokenStream {
     let tag_name = input.ident.to_string().to_lower_camel_case();
+
+    let field_writers: TokenStream = match input.data {
+        Data::Struct(ref data) => match data.fields {
+            Fields::Named(ref fields) => {
+                let recurse = fields.named.iter().map(|f| {
+                    let name = &f
+                        .ident
+                        .as_ref()
+                        .expect("Named field should have an identifier");
+                    let field_tag_name = name.to_string().to_lower_camel_case();
+
+                    quote_spanned! { f.span() =>
+                       ex_em_ell::traits::ToXmlElement::to_xml_element(&self.#name, writer, #field_tag_name)?;
+                    }
+                });
+                quote! {
+                    #(#recurse)*
+                }
+            }
+            Fields::Unnamed(ref fields) => unimplemented!(),
+            Fields::Unit => unimplemented!(),
+        },
+        Data::Enum(_) => unimplemented!(),
+        Data::Union(_) => unimplemented!(),
+    };
+
     quote! {
-        ex_em_ell::xml_utils::write_simple_tag(writer, &#tag_name, "TODO")?;
+        writer.write(ex_em_ell::xml::writer::XmlEvent::start_element(#tag_name)).map_err(ex_em_ell::xml_utils::to_xml_write_error(#tag_name))?;
+
+        #field_writers
+
+        writer.write(ex_em_ell::xml::writer::XmlEvent::end_element()).map_err(ex_em_ell::xml_utils::to_xml_write_error(#tag_name))?;
+
     }
 }

@@ -40,3 +40,13 @@ pub trait FromXmlElement {
     where
         Self: Sized;
 }
+
+impl ToXmlElement for String {
+    fn to_xml_element<W: Write>(
+        self: &Self,
+        writer: &mut EventWriter<W>,
+        tag: &str,
+    ) -> Result<(), XmlWriteError> {
+        crate::xml_utils::write_simple_tag(writer, tag, self)
+    }
+}

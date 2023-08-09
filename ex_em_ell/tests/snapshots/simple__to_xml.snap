@@ -1,0 +1,8 @@
+---
+source: ex_em_ell/tests/simple.rs
+expression: actual
+---
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+  <field>value</field>
+</example>

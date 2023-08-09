@@ -33,7 +33,16 @@
 
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
 
-        src = craneLib.cleanCargoSource (craneLib.path ./.);
+        xmlFilter = path: _type: builtins.match ".*xml$" path != null;
+        snapshotTestFilter = path: _type: builtins.match ".*snap" path != null;
+
+        srcFilter = path: type:
+          (xmlFilter path type) || (snapshotTestFilter path type) || (craneLib.filterCargoSources path type);
+
+        src = pkgs.lib.cleanSourceWith {
+          src = craneLib.path ./.;
+          filter = srcFilter;
+        };
 
         commonArgs = {
           inherit src;
