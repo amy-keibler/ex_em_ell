@@ -3,7 +3,10 @@ use xml::{
     attribute::OwnedAttribute, name::OwnedName, namespace::Namespace, EventReader, EventWriter,
 };
 
-use crate::errors::{XmlReadError, XmlWriteError};
+use crate::{
+    errors::{XmlReadError, XmlWriteError},
+    xml_utils::{read_simple_tag, write_simple_tag},
+};
 
 pub trait ToXmlDocument {
     fn to_xml_document<W: Write>(
@@ -47,6 +50,20 @@ impl ToXmlElement for String {
         writer: &mut EventWriter<W>,
         tag: &str,
     ) -> Result<(), XmlWriteError> {
-        crate::xml_utils::write_simple_tag(writer, tag, self)
+        write_simple_tag(writer, tag, self)
+    }
+}
+
+impl FromXmlElement for String {
+    fn from_xml_element<R: Read>(
+        reader: &mut EventReader<R>,
+        element_name: &OwnedName,
+        _element_attributes: &[OwnedAttribute],
+        _element_namespace: &Namespace,
+    ) -> Result<Self, XmlReadError>
+    where
+        Self: Sized,
+    {
+        read_simple_tag(reader, element_name)
     }
 }
