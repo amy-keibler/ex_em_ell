@@ -1,6 +1,7 @@
 ---
 source: ex_em_ell/tests/simple.rs
-expression: actual
+expression: round_trip
+input_file: ex_em_ell/tests/data/simple/valid_example.xml
 ---
 <?xml version="1.0" encoding="utf-8"?>
 <example>
