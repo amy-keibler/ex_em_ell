@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+    <directChild>value1</directChild>
+    <directChild>value2</directChild>
+    <directChild>value3</directChild>
+    <indirectChildren>
+        <indirectChild>
+            <field>value1</field>
+        </indirectChild>
+        <indirectChild>
+            <field>value2</field>
+        </indirectChild>
+        <indirectChild>
+            <field>value3</field>
+        </indirectChild>
+    </child>
+</example>

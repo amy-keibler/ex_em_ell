@@ -9,20 +9,17 @@ use crate::{
 };
 
 pub trait ToXmlDocument {
-    fn to_xml_document<W: Write>(
-        self: &Self,
-        writer: &mut EventWriter<W>,
-    ) -> Result<(), XmlWriteError>;
+    fn to_xml_document<W: Write>(&self, writer: &mut EventWriter<W>) -> Result<(), XmlWriteError>;
 }
 
 pub trait ToXmlElement {
     fn to_xml_element<W: Write>(
-        self: &Self,
+        &self,
         writer: &mut EventWriter<W>,
         tag: &str,
     ) -> Result<(), XmlWriteError>;
 
-    fn will_write(self: &Self) -> bool {
+    fn will_write(&self) -> bool {
         true
     }
 }
@@ -46,7 +43,7 @@ pub trait FromXmlElement {
 
 impl ToXmlElement for String {
     fn to_xml_element<W: Write>(
-        self: &Self,
+        &self,
         writer: &mut EventWriter<W>,
         tag: &str,
     ) -> Result<(), XmlWriteError> {
@@ -65,5 +62,19 @@ impl FromXmlElement for String {
         Self: Sized,
     {
         read_simple_tag(reader, element_name)
+    }
+}
+
+impl<T: ToXmlElement> ToXmlElement for Vec<T> {
+    fn to_xml_element<W: Write>(
+        &self,
+        writer: &mut EventWriter<W>,
+        tag: &str,
+    ) -> Result<(), XmlWriteError> {
+        for item in self.iter() {
+            item.to_xml_element(writer, tag)?;
+        }
+
+        Ok(())
     }
 }

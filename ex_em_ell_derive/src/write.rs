@@ -12,7 +12,7 @@ pub(crate) fn generate_write_xml_document(
 
     let tag_name_variable = format_ident!("_{}", "tag_name");
 
-    let writer = generate_write_xml_element(input, &writer_variable, &tag_name_variable);
+    let writer = generate_write_xml_element(input, writer_variable, &tag_name_variable);
 
     quote! {
         let #tag_name_variable = #tag_name;
@@ -44,7 +44,19 @@ pub(crate) fn generate_write_xml_element(
                     #(#recurse)*
                 }
             }
-            Fields::Unnamed(_) => unimplemented!(),
+            Fields::Unnamed(ref fields) => {
+                if fields.unnamed.len() != 1 {
+                    panic!("Currently only single element tuple structs are supported");
+                }
+                let field = fields
+                    .unnamed
+                    .first()
+                    .expect("Expected a field on the tuple struct");
+                // TODO: singularize the tag_name_variable as the default behavior
+                quote_spanned! { field.span() =>
+                    ex_em_ell::traits::ToXmlElement::to_xml_element(&self.0, #writer_variable, #tag_name_variable)?;
+                }
+            }
             Fields::Unit => unimplemented!(),
         },
         Data::Enum(_) => unimplemented!(),

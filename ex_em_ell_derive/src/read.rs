@@ -74,7 +74,7 @@ fn generate_read(
     reader_variable: &Ident,
     tag_name_variable: &Ident,
 ) -> (TokenStream, TokenStream) {
-    let (variable_declarations, state_machine, required_variables, struct_fields): (
+    let (variable_declarations, state_machine, required_variables, output): (
         TokenStream,
         TokenStream,
         TokenStream,
@@ -169,14 +169,30 @@ fn generate_read(
 
                 let struct_fields: TokenStream = struct_fields_recurse.into_iter().collect();
 
+                let output: TokenStream = quote! {
+                    Self {
+                        #struct_fields
+                    }
+                };
+
                 (
                     variable_declarations,
                     state_machine,
                     required_variables,
-                    struct_fields,
+                    output,
                 )
             }
-            Fields::Unnamed(_) => unimplemented!(),
+            Fields::Unnamed(ref fields) => {
+                if fields.unnamed.len() != 1 {
+                    panic!("Currently only single element tuple structs are supported");
+                }
+                let field = fields
+                    .unnamed
+                    .first()
+                    .expect("Expected a field on the tuple struct");
+
+                todo!();
+            }
             Fields::Unit => unimplemented!(),
         },
         Data::Enum(_) => unimplemented!(),
@@ -193,8 +209,6 @@ fn generate_read(
         },
         quote! {
 
-        Ok(Self {
-            #struct_fields
-        })},
+        Ok(#output)},
     )
 }
