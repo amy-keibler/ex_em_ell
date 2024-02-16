@@ -1,3 +1,4 @@
+use darling::FromMeta;
 use heck::ToLowerCamelCase;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
@@ -102,7 +103,8 @@ fn generate_read(
 
                     let variable_type = &f.ty;
 
-                    let field_tag_name = name.to_string().to_lower_camel_case();
+                    let read_attrs: ReadAttrs = f.attrs.iter().find_map(|attr| FromMeta::from_meta(&attr.meta).ok()).unwrap_or_default();
+                    let field_tag_name = read_attrs.rename.unwrap_or_else(|| name.to_string().to_lower_camel_case());
 
                     let variable_declaration = quote_spanned! { f.span() =>
                                      let mut #variable : Option<#variable_type> = None;
@@ -197,4 +199,10 @@ fn generate_read(
             #struct_fields
         })},
     )
+}
+
+#[derive(Debug, Default, FromMeta)]
+struct ReadAttrs {
+    #[darling(default)]
+    rename: Option<String>,
 }

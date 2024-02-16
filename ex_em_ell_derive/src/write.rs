@@ -1,8 +1,10 @@
+use darling::FromMeta;
 use heck::ToLowerCamelCase;
+use itertools::Itertools;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{Data, DeriveInput, Fields};
+use syn::{Data, DeriveInput, Expr, Fields};
 
 pub(crate) fn generate_write_xml_document(
     input: &DeriveInput,
@@ -34,7 +36,9 @@ pub(crate) fn generate_write_xml_element(
                         .ident
                         .as_ref()
                         .expect("Named field should have an identifier");
-                    let field_tag_name = name.to_string().to_lower_camel_case();
+
+                    let write_attrs: WriteAttrs = f.attrs.iter().find_map(|attr| FromMeta::from_meta(&attr.meta).ok()).unwrap_or_default();
+                    let field_tag_name = write_attrs.rename.unwrap_or_else(|| name.to_string().to_lower_camel_case());
 
                     quote_spanned! { f.span() =>
                        ex_em_ell::traits::ToXmlElement::to_xml_element(&self.#name, #writer_variable, #field_tag_name)?;
@@ -59,4 +63,10 @@ pub(crate) fn generate_write_xml_element(
         #writer_variable.write(ex_em_ell::xml::writer::XmlEvent::end_element()).map_err(ex_em_ell::xml_utils::to_xml_write_error(#tag_name_variable))?;
 
     }
+}
+
+#[derive(Debug, Default, FromMeta)]
+struct WriteAttrs {
+    #[darling(default)]
+    rename: Option<String>,
 }
