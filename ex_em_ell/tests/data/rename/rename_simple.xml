@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+  <fieldURL>value</fieldURL>
+  <childURL>
+    <fieldURL>value</fieldURL>
+  </childURL>
+</example>

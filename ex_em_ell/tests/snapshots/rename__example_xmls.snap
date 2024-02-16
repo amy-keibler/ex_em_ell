@@ -1,0 +1,12 @@
+---
+source: ex_em_ell/tests/rename.rs
+expression: round_trip
+input_file: ex_em_ell/tests/data/rename/rename_simple.xml
+---
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+  <fieldURL>value</fieldURL>
+  <childURL>
+    <fieldURL>value</fieldURL>
+  </childURL>
+</example>
