@@ -1,7 +1,4 @@
-use std::{
-    fmt::Display,
-    io::{Read, Write},
-};
+use std::io::{Read, Write};
 use xml::{
     attribute::OwnedAttribute, name::OwnedName, namespace::Namespace, EventReader, EventWriter,
 };
