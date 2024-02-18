@@ -1,0 +1,30 @@
+name: "Release to crates.io"
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: "release type (major, minor, patch)"
+        required: true
+        default: "patch"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@
+      - name: Run the Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v3
+
+      # Build and test before releasing
+      - name: Build the default flake output
+        run: nix build
+
+      - name: Check the flake outputs
+        run: nix flake check
+
+      # Run cargo-release
+      - name: Release the crate
+        run: nix develop --command cargo release "${{ github.event.inputs.releaseType }}"

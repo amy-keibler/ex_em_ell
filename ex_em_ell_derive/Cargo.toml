@@ -3,8 +3,10 @@ name = "ex_em_ell_derive"
 version = "0.1.0"
 edition = "2021"
 description = "Provide macros for serializing and deserializing XML (derive sub-crate)"
-
+keywords = [ "xml" ]
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/amy-keibler/ex_em_ell"
+homepage = "https://github.com/amy-keibler/ex_em_ell"
 
 [lib]
 proc_macro = true

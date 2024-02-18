@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 use quote::{format_ident, quote};
 use syn::{parse_macro_input, parse_quote, DeriveInput, GenericParam, Generics};
 

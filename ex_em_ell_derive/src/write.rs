@@ -1,16 +1,22 @@
 use darling::FromMeta;
 use heck::ToLowerCamelCase;
-use itertools::Itertools;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{Data, DeriveInput, Expr, Fields};
+use syn::{Data, DeriveInput, Fields};
 
 pub(crate) fn generate_write_xml_document(
     input: &DeriveInput,
     writer_variable: &Ident,
 ) -> TokenStream {
-    let tag_name = input.ident.to_string().to_lower_camel_case();
+    let write_attrs: WriteAttrs = input
+        .attrs
+        .iter()
+        .find_map(|attr| FromMeta::from_meta(&attr.meta).ok())
+        .unwrap_or_default();
+    let tag_name = write_attrs
+        .rename
+        .unwrap_or_else(|| input.ident.to_string().to_lower_camel_case());
 
     let tag_name_variable = format_ident!("_{}", "tag_name");
 

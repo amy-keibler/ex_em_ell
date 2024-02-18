@@ -33,11 +33,17 @@
 
         craneLib = (crane.mkLib pkgs).overrideToolchain rustToolchain;
 
+        # Required for tests
         xmlFilter = path: _type: builtins.match ".*xml$" path != null;
         snapshotTestFilter = path: _type: builtins.match ".*snap" path != null;
 
-        srcFilter = path: type:
-          (xmlFilter path type) || (snapshotTestFilter path type) || (craneLib.filterCargoSources path type);
+        # Required for including the README files in the documentation
+        readmeFilter = path: _type: builtins.match ".*/README.md$" path != null;
+
+        srcFilter = path: type: (xmlFilter path type)
+          || (snapshotTestFilter path type)
+          || (readmeFilter path type)
+          || (craneLib.filterCargoSources path type);
 
         src = pkgs.lib.cleanSourceWith {
           src = craneLib.path ./.;
@@ -97,6 +103,7 @@
             cargo-insta
             cargo-msrv
             cargo-outdated
+            cargo-release
 
             # GitHub tooling
             gh

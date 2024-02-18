@@ -9,7 +9,14 @@ pub(crate) fn generate_read_xml_document(
     input: &DeriveInput,
     reader_variable: &Ident,
 ) -> TokenStream {
-    let tag_name = input.ident.to_string().to_lower_camel_case();
+    let read_attrs: ReadAttrs = input
+        .attrs
+        .iter()
+        .find_map(|attr| FromMeta::from_meta(&attr.meta).ok())
+        .unwrap_or_default();
+    let tag_name = read_attrs
+        .rename
+        .unwrap_or_else(|| input.ident.to_string().to_lower_camel_case());
 
     // Borrow the tag OwnedName so it can be consistent with what's passed to FromXmlElement
     let tag_name_variable = format_ident!("_{}", "tag_name");

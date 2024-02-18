@@ -1,6 +1,7 @@
+// Support Acronym Case conventions without forcing the Rust variable to be field_u_r_l
 #[derive(Debug, PartialEq, ex_em_ell::FromXmlDocument, ex_em_ell::ToXmlDocument)]
+#[ex_em_ell(rename = "exampleURL")]
 struct Example {
-    // Support Acronym Case conventions without forcing the Rust variable to be field_u_r_l
     #[ex_em_ell(rename = "fieldURL")]
     field_url: String,
 
