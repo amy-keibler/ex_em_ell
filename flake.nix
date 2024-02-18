@@ -97,6 +97,7 @@
             cargo-insta
             cargo-msrv
             cargo-outdated
+            cargo-release
 
             # GitHub tooling
             gh
