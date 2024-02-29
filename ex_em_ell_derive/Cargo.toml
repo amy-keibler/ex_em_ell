@@ -12,7 +12,7 @@ homepage = "https://github.com/amy-keibler/ex_em_ell"
 proc_macro = true
 
 [dependencies]
-darling = "0.20.7"
+darling = "0.20.8"
 heck = { version = "0.4.1", features = ["unicode"] }
 itertools = "0.12.1"
 proc-macro-error = "1.0.4"
