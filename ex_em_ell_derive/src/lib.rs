@@ -1,5 +1,7 @@
 #![doc = include_str!("../README.md")]
 
+use darling::FromMeta;
+use heck::ToLowerCamelCase;
 use quote::{format_ident, quote};
 use syn::{parse_macro_input, parse_quote, DeriveInput, GenericParam, Generics};
 
@@ -137,6 +139,45 @@ pub fn enecode_derive_element(input: proc_macro::TokenStream) -> proc_macro::Tok
 
     // Hand the output tokens back to the compiler.
     proc_macro::TokenStream::from(expanded)
+}
+
+#[proc_macro_error::proc_macro_error]
+#[proc_macro_derive(NamedXmlElement, attributes(ex_em_ell))]
+pub fn name_derive_element(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    let name = input.ident;
+
+    let name_attrs: NameAttrs = input
+        .attrs
+        .iter()
+        .find_map(|attr| FromMeta::from_meta(&attr.meta).ok())
+        .unwrap_or_default();
+    let element_name = name_attrs
+        .name
+        .unwrap_or_else(|| name.to_string().to_lower_camel_case());
+
+    // Add a bound `T: FromXmlElement` to every type parameter T.
+    let generics = add_to_xml_element_trait_bounds(input.generics);
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    let expanded = quote! {
+        // The generated impl.
+        impl #impl_generics ex_em_ell::traits::NamedXmlElement for #name #ty_generics #where_clause {
+            fn xml_element_name() -> &'static str
+            {
+                #element_name
+            }
+        }
+    };
+
+    // Hand the output tokens back to the compiler.
+    proc_macro::TokenStream::from(expanded)
+}
+
+#[derive(Debug, Default, FromMeta)]
+struct NameAttrs {
+    #[darling(default)]
+    name: Option<String>,
 }
 
 // Add a bound `T: ToXmlElement` to every type parameter T.
