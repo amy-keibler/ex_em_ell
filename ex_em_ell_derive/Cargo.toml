@@ -1,6 +1,6 @@
 [package]
 name = "ex_em_ell_derive"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 description = "Provide macros for serializing and deserializing XML (derive sub-crate)"
 keywords = [ "xml" ]
