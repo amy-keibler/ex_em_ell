@@ -29,4 +29,4 @@ jobs:
       - name: Release the crate
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: nix develop --command cargo release --execute "${{ github.event.inputs.releaseType }}"
+        run: nix develop --command cargo release --execute --no-confirm "${{ github.event.inputs.releaseType }}"
