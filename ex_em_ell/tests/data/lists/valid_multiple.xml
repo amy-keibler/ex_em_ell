@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+  <children>
+    <child>
+      <field>value</field>
+    </child>
+    <child>
+      <field>value</field>
+    </child>
+  </children>
+</example>

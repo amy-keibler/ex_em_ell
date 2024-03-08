@@ -1,11 +1,12 @@
 use std::io::{Read, Write};
 use xml::{
-    attribute::OwnedAttribute, name::OwnedName, namespace::Namespace, EventReader, EventWriter,
+    attribute::OwnedAttribute, name::OwnedName, namespace::Namespace, writer, EventReader,
+    EventWriter,
 };
 
 use crate::{
     errors::{XmlReadError, XmlWriteError},
-    xml_utils::{read_simple_tag, write_simple_tag},
+    xml_utils::{read_list_tag, read_simple_tag, to_xml_write_error, write_simple_tag},
 };
 
 pub trait ToXmlDocument {
@@ -25,6 +26,10 @@ pub trait ToXmlElement {
     fn will_write(self: &Self) -> bool {
         true
     }
+}
+
+pub trait NamedXmlElement {
+    fn xml_element_name() -> &'static str;
 }
 
 pub trait FromXmlDocument {
@@ -100,5 +105,51 @@ impl FromXmlElement for bool {
                 }),
             }
         })
+    }
+}
+
+impl<T> ToXmlElement for Vec<T>
+where
+    T: ToXmlElement + NamedXmlElement,
+{
+    fn to_xml_element<W: Write>(
+        self: &Self,
+        writer: &mut EventWriter<W>,
+        tag: &str,
+    ) -> Result<(), XmlWriteError> {
+        writer
+            .write(writer::XmlEvent::start_element(tag))
+            .map_err(to_xml_write_error(tag))?;
+
+        for element in self {
+            element.to_xml_element(writer, T::xml_element_name())?;
+        }
+
+        writer
+            .write(writer::XmlEvent::end_element())
+            .map_err(to_xml_write_error(tag))?;
+
+        Ok(())
+    }
+
+    fn will_write(self: &Self) -> bool {
+        self.iter().any(|e| e.will_write())
+    }
+}
+
+impl<T> FromXmlElement for Vec<T>
+where
+    T: FromXmlElement + NamedXmlElement,
+{
+    fn from_xml_element<R: Read>(
+        reader: &mut EventReader<R>,
+        element_name: &OwnedName,
+        _element_attributes: &[OwnedAttribute],
+        _element_namespace: &Namespace,
+    ) -> Result<Self, XmlReadError>
+    where
+        Self: Sized,
+    {
+        read_list_tag(reader, element_name, T::xml_element_name())
     }
 }

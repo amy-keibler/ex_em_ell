@@ -95,6 +95,7 @@ version = "0.1.0"
 dependencies = [
  "ex_em_ell_derive",
  "insta",
+ "itertools",
  "thiserror",
  "xml-rs",
 ]

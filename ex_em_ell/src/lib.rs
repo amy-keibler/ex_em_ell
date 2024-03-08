@@ -10,9 +10,11 @@ use errors::{XmlReadError, XmlWriteError};
 use xml::{EmitterConfig, EventReader, EventWriter, ParserConfig};
 
 #[cfg(feature = "derive")]
-pub use ex_em_ell_derive::{FromXmlDocument, FromXmlElement, ToXmlDocument, ToXmlElement};
+pub use ex_em_ell_derive::{
+    FromXmlDocument, FromXmlElement, NamedXmlElement, ToXmlDocument, ToXmlElement,
+};
 
-pub use traits::{FromXmlDocument, FromXmlElement, ToXmlDocument, ToXmlElement};
+pub use traits::{FromXmlDocument, FromXmlElement, NamedXmlElement, ToXmlDocument, ToXmlElement};
 pub extern crate xml;
 
 pub fn to_string<T: ToXmlDocument>(value: &T) -> Result<String, XmlWriteError> {

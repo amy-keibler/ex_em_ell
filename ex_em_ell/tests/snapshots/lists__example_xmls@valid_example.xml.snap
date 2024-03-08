@@ -1,0 +1,13 @@
+---
+source: ex_em_ell/tests/lists.rs
+expression: round_trip
+input_file: ex_em_ell/tests/data/lists/valid_example.xml
+---
+<?xml version="1.0" encoding="utf-8"?>
+<example>
+  <children>
+    <child>
+      <field>value</field>
+    </child>
+  </children>
+</example>
