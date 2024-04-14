@@ -108,6 +108,36 @@ impl FromXmlElement for bool {
     }
 }
 
+impl ToXmlElement for u32 {
+    fn to_xml_element<W: Write>(
+        self: &Self,
+        writer: &mut EventWriter<W>,
+        tag: &str,
+    ) -> Result<(), XmlWriteError> {
+        write_simple_tag(writer, tag, &self.to_string())
+    }
+}
+
+impl FromXmlElement for u32 {
+    fn from_xml_element<R: Read>(
+        reader: &mut EventReader<R>,
+        element_name: &OwnedName,
+        _element_attributes: &[OwnedAttribute],
+        _element_namespace: &Namespace,
+    ) -> Result<Self, XmlReadError>
+    where
+        Self: Sized,
+    {
+        read_simple_tag(reader, element_name).and_then(|value| {
+            value.parse().map_err(|_| XmlReadError::InvalidParseError {
+                value: value.to_string(),
+                data_type: "xs:integer".to_string(),
+                element: element_name.to_string(),
+            })
+        })
+    }
+}
+
 impl<T> ToXmlElement for Vec<T>
 where
     T: ToXmlElement + NamedXmlElement,
