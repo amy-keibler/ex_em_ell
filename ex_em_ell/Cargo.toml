@@ -10,9 +10,9 @@ homepage = "https://github.com/amy-keibler/ex_em_ell"
 
 [dependencies]
 ex_em_ell_derive = { path = "../ex_em_ell_derive", version = "0.3.0", optional = true }
-itertools = "0.12.1"
-thiserror = "1.0.57"
-xml-rs = "0.8.19"
+itertools = "0.13.0"
+thiserror = "1.0.64"
+xml-rs = "0.8.22"
 
 [features]
 default = ["derive"]
